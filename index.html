@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS | Next-Gen Gaming Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a0a16;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .game-container {
+            width: 1600px;
+            height: 900px;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 
+                0 0 50px rgba(0, 195, 255, 0.3),
+                0 0 100px rgba(255, 0, 128, 0.2);
+            transform-style: preserve-3d;
+        }
+
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 195, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 128, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 195, 255, 0.1) 0%, transparent 50%);
+            background-color: #0a0a16;
+            z-index: -1;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: rgba(0, 195, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(0, 195, 255, 0.7);
+            animation: float 15s infinite linear;
+        }
+
+        .particle:nth-child(2n) {
+            background-color: rgba(255, 0, 128, 0.7);
+            box-shadow: 0 0 10px 2px rgba(255, 0, 128, 0.7);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ui-panel {
+            position: absolute;
+            background: rgba(20, 20, 40, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 195, 255, 0.3);
+            box-shadow: 
+                0 0 20px rgba(0, 195, 255, 0.2),
+                inset 0 0 20px rgba(0, 195, 255, 0.1);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .ui-panel:hover {
+            box-shadow: 
+                0 0 30px rgba(0, 195, 255, 0.4),
+                inset 0 0 20px rgba(0, 195, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .profile-panel {
+            top: 30px;
+            left: 30px;
+            width: 300px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00c3ff, #ff0080);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            margin-right: 15px;
+            box-shadow: 0 0 20px rgba(0, 195, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .profile-panel:hover .profile-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.7);
+        }
+
+        .profile-info h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #00c3ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+
+        .profile-info p {
+            font-size: 14px;
+            color: #a0a0d0;
+        }
+
+        .start-button {
+            position: absolute;
+            bottom: 60px;
+            left: 60px;
+            width: 280px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(0, 195, 255, 0.2), rgba(255, 0, 128, 0.2));
+            border: 2px solid rgba(0, 195, 255, 0.5);
+            border-radius: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0 30px rgba(0, 195, 255, 0.3),
+                inset 0 0 20px rgba(0, 195, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .start-button:hover::before {
+            left: 100%;
+        }
+
+        .start-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 0 40px rgba(0, 195, 255, 0.5),
+                inset 0 0 20px rgba(0, 195, 255, 0.2);
+            background: linear-gradient(135deg, rgba(0, 195, 255, 0.3), rgba(255, 0, 128, 0.3));
+        }
+
+        .logo-panel {
+            top: 40px;
+            right: 40px;
+            width: 400px;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-logo {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #00c3ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 195, 255, 0.5);
+            letter-spacing: 3px;
+            animation: glow 3s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(255, 0, 128, 0.7);
+            }
+        }
+
+        .leaderboard-panel {
+            bottom: 60px;
+            right: 40px;
+            width: 400px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            background: linear-gradient(90deg, #00c3ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-track {
+            background: rgba(0, 195, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00c3ff, #ff0080);
+            border-radius: 10px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: rgba(30, 30, 60, 0.5);
+            border-radius: 10px;
+            border-left: 3px solid #00c3ff;
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-item:nth-child(2) {
+            border-left-color: gold;
+        }
+
+        .leaderboard-item:nth-child(3) {
+            border-left-color: silver;
+        }
+
+        .leaderboard-item:nth-child(4) {
+            border-left-color: #cd7f32; /* bronze */
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(40, 40, 80, 0.7);
+            transform: translateX(5px);
+        }
+
+        .profile-editor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+        }
+
+        .editor-title {
+            font-size: 36px;
+            margin-bottom: 40px;
+            background: linear-gradient(90deg, #00c3ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .editor-panel {
+            width: 600px;
+            background: rgba(20, 20, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 195, 255, 0.3);
+            box-shadow: 
+                0 0 40px rgba(0, 195, 255, 0.3),
+                inset 0 0 20px rgba(0, 195, 255, 0.1);
+            padding: 30px;
+        }
+
+        .editor-section {
+            margin-bottom: 25px;
+        }
+
+        .editor-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #00c3ff;
+            font-size: 18px;
+        }
+
+        .editor-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(30, 30, 60, 0.7);
+            border: 1px solid rgba(0, 195, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .editor-input:focus {
+            outline: none;
+            border-color: #ff0080;
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.3);
+        }
+
+        .avatar-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .avatar-option {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00c3ff, #ff0080);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.7);
+        }
+
+        .editor-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .editor-button {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-button {
+            background: linear-gradient(135deg, #00c3ff, #0077ff);
+            border: none;
+            color: white;
+        }
+
+        .cancel-button {
+            background: transparent;
+            border: 2px solid #ff0080;
+            color: #ff0080;
+        }
+
+        .save-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 195, 255, 0.5);
+        }
+
+        .cancel-button:hover {
+            background: rgba(255, 0, 128, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
+        }
+
+        .close-editor {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 0, 128, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-editor:hover {
+            background: rgba(255, 0, 128, 0.4);
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="background"></div>
+        
+        <div class="particles" id="particles-container"></div>
+        
+        <!-- Profile Panel -->
+        <div class="ui-panel profile-panel" id="profile-panel">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-info">
+                <h2>NEXUS_PLAYER</h2>
+                <p>Level 42 | Rank: Elite</p>
+            </div>
+        </div>
+        
+        <!-- Start Button -->
+        <div class="start-button">
+            START GAME
+        </div>
+        
+        <!-- Logo Panel -->
+        <div class="ui-panel logo-panel">
+            <div class="game-logo">NEXUS</div>
+            <div class="panel-title">NEXT-GEN GAMING INTERFACE</div>
+        </div>
+        
+        <!-- Leaderboard Panel -->
+        <div class="ui-panel leaderboard-panel">
+            <div class="panel-title">LEADERBOARD</div>
+            <ul class="leaderboard-list">
+                <li class="leaderboard-item">
+                    <span>NEXUS_PLAYER</span>
+                    <span>9,842,120</span>
+                </li>
+                <li class="leaderboard-item">
+                    <span>CYBER_SHADOW</span>
+                    <span>9,521,340</span>
+                </li>
+                <li class="leaderboard-item">
+                    <span>NEON_GHOST</span>
+                    <span>8,994,670</span>
+                </li>
+                <li class="leaderboard-item">
+                    <span>TOKYO_DREAMER</span>
+                    <span>8,761,230</span>
+                </li>
+                <li class="leaderboard-item">
+                    <span>SYNTH_WAVE</span>
+                    <span>8,543,110</span>
+                </li>
+                <li class="leaderboard-item">
+                    <span>HOLO_QUEEN</span>
+                    <span>8,321,450</span>
+                </li>
+                <li class="leaderboard-item">
+                    <span>DATA_STREAM</span>
+                    <span>8,112,780</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Profile Editor (Hidden by default) -->
+        <div class="profile-editor" id="profile-editor">
+            <div class="close-editor" id="close-editor">
+                <i class="fas fa-times"></i>
+            </div>
+            <h2 class="editor-title">PROFILE EDITOR</h2>
+            <div class="editor-panel">
+                <div class="editor-section">
+                    <label class="editor-label">USERNAME</label>
+                    <input type="text" class="editor-input" value="NEXUS_PLAYER">
+                </div>
+                
+                <div class="editor-section">
+                    <label class="editor-label">AVATAR</label>
+                    <div class="avatar-options">
+                        <div class="avatar-option"><i class="fas fa-robot"></i></div>
+                        <div class="avatar-option"><i class="fas fa-user-astronaut"></i></div>
+                        <div class="avatar-option"><i class="fas fa-gamepad"></i></div>
+                        <div class="avatar-option"><i class="fas fa-mask"></i></div>
+                        <div class="avatar-option"><i class="fas fa-ghost"></i></div>
+                    </div>
+                </div>
+                
+                <div class="editor-section">
+                    <label class="editor-label">THEME COLOR</label>
+                    <input type="color" class="editor-input" value="#00c3ff">
+                </div>
+                
+                <div class="editor-buttons">
+                    <button class="editor-button cancel-button" id="cancel-edit">CANCEL</button>
+                    <button class="editor-button save-button" id="save-profile">SAVE PROFILE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles-container');
+        for (let i = 0; i < 40; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 15}s`;
+            particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+            particlesContainer.appendChild(particle);
+        }
+
+        // Profile editor functionality
+        const profilePanel = document.getElementById('profile-panel');
+        const profileEditor = document.getElementById('profile-editor');
+        const closeEditor = document.getElementById('close-editor');
+        const cancelEdit = document.getElementById('cancel-edit');
+        const saveProfile = document.getElementById('save-profile');
+
+        profilePanel.addEventListener('click', () => {
+            profileEditor.style.display = 'flex';
+        });
+
+        closeEditor.addEventListener('click', () => {
+            profileEditor.style.display = 'none';
+        });
+
+        cancelEdit.addEventListener('click', () => {
+            profileEditor.style.display = 'none';
+        });
+
+        saveProfile.addEventListener('click', () => {
+            profileEditor.style.display = 'none';
+            // In a real app, we would save the profile changes here
+        });
+
+        // Start button animation
+        const startButton = document.querySelector('.start-button');
+        startButton.addEventListener('click', () => {
+            startButton.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                startButton.style.transform = 'scale(1.05)';
+            }, 100);
+            // In a real app, we would start the game here
+        });
+    </script>
+</body>
+</html>
